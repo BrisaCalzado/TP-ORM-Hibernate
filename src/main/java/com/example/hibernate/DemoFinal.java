@@ -1,16 +1,15 @@
 package com.example.hibernate;
 
-import com.example.hibernate.dominio.Alumno;
-import com.example.hibernate.dominio.Calificacion;
-import com.example.hibernate.dominio.Curso;
-import com.example.hibernate.dominio.Examen;
-import com.example.hibernate.dominio.Persona;
-import com.example.hibernate.dominio.Profesor;
+import com.example.hibernate.dominio.*;
 import com.example.hibernate.utils.BDUtils;
 import java.time.LocalDateTime;
 import static java.util.Arrays.asList;
-import java.util.List;
+
+import java.util.*;
 import javax.persistence.EntityManager;
+
+import javax.persistence.EntityManager;
+import java.util.List;
 
 public class DemoFinal {
 
@@ -19,56 +18,68 @@ public class DemoFinal {
         EntityManager em = BDUtils.getEntityManager();
         BDUtils.comenzarTransaccion(em);
 
-//        try {
-            Alumno marcos = new Alumno();
-            //Insert
-            em.persist(marcos);
-//        } catch (Exception e) {
-//            BDUtils.rollback(em);
-//            return;
-//        }
+        // Crear convocatoria con requisitos
+        Convocatoria convocatoria = new Convocatoria();
+        convocatoria.setTiempoInicio(new Date());
+        convocatoria.setTiempoFinalizacion(new Date());
+        convocatoria.setGeneroPersona(GeneroPersona.MASCULINO);
+        convocatoria.setEdadMinima(18);
+        convocatoria.setEdadMaxima(40);
+        convocatoria.setGeneroObra("Comedia");
+        convocatoria.setTipoRemuneracion("Remunerado");
+        convocatoria.setLocalizacion("CABA");
+        convocatoria.setInfoAdicional("Convocatoria completa");
+        convocatoria.setEstadoConvocatoria(EstadoConvocatoria.ACTIVA);
+        convocatoria.setTipoConvocatoria(TipoConvocatoria.CORTO);
+        convocatoria.setProductoPublicitario("Producto Real");
 
-        //Update
-        marcos.setNombre("Marcos"); //Entidad administrada -> detecta cambios
-        marcos.setPromedio(6.75);
+        Requisito req1 = new Requisito();
+        req1.setDescripcion("Tener experiencia mínima 1 año");
+        Requisito req2 = new Requisito();
+        req2.setDescripcion("Disponibilidad completa");
 
-        Curso dds = new Curso();
-        dds.setHorario(LocalDateTime.now());
-        em.persist(dds); //antes de asociar entidades deben estar persistidas
+        convocatoria.setRequisitos(Arrays.asList(req1, req2));
+        em.persist(req1);
+        em.persist(req2);
+        em.persist(convocatoria);
 
-        marcos.setCursos(asList(dds));
+        // 2️⃣ Crear postulante
+        Postulante postulante = new Postulante();
+        postulante.setNombre("Marcos");
+        postulante.setEdad(28);
+        em.persist(postulante);
 
-        System.out.println("ID MARCOS: " + marcos.getId());
+        //Crear postulación
+        Postulacion postulacion = new Postulacion();
+        postulacion.setConvocatoria(convocatoria);
+        postulacion.setPostulante(postulante);
+        postulacion.setCv("cv_marcos.pdf");
+        postulacion.setReelURL("reel_marcos.mp4");
+        postulacion.setEstado(EstadoPostulacion.INICIADA);
+        postulacion.setFechaPostulacion(new Date());
+        postulacion.setFotos(new ArrayList<>());// lista vacía de ejemplo
+        em.persist(postulacion);
 
-        Profesor julian = new Profesor();
-        julian.setNombre("Julian");
-        julian.setSalario(1000.55);
+        //Update de entidad administrada
+        postulante.setNombre("Marcos Actualizado");
+        postulacion.setEstado(EstadoPostulacion.APROBADA);
 
-        em.persist(julian);
-
-        //examen
-        Examen examenDeMarcos = new Examen();
-        examenDeMarcos.setAlumno(marcos);
-        examenDeMarcos.setCalificacion(Calificacion.BIEN);
-        examenDeMarcos.setNota(6);
-
-        em.persist(examenDeMarcos);
-
-        //JPQL Query
-        List<Persona> personas = em
-                // equivalente a: select * from persona where persona.nombre = 'Julian'
-                .createQuery("select p from Persona p where p.nombre = ?1", Persona.class) //ojo, query no tipada
-                .setParameter(1, "Julian")
+        //Consulta JPQL
+        List<Postulacion> postulaciones = em.createQuery(
+                        "SELECT p FROM Postulacion p WHERE p.estado = ?1", Postulacion.class)
+                .setParameter(1, EstadoPostulacion.APROBADA)
                 .getResultList();
 
-        System.out.println(personas);
+        System.out.println("Postulaciones aprobadas: " + postulaciones.size());
 
-        //Delete
-        for (Persona persona : personas) {
-            em.remove(persona);
+        //Delete ejemplo (solo si querés limpiar)
+        for (Postulacion p : postulaciones) {
+            em.remove(p);
         }
 
         BDUtils.commit(em);
-    }
 
+        System.out.println("DemoFinal completado correctamente.");
+    }
 }
+
