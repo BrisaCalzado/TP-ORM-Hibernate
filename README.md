@@ -1,4 +1,15 @@
-# demo-hibernate
+# TP ORM Hibernate Grupo 4
+
+## Integrantes:
+- Aylen Chazarreta
+- Brisa Calzado
+- Facundo Medina
+- Joaquin Idiart
+- Lucas Bogado
+- Martina Mendez
+- Ramiro Cabrera
+
+# Demo-hibernate
 
 Demo de ORM con Java Hibernate a una base de datos MySql 8
 
