@@ -43,11 +43,22 @@ public class DemoFinal {
         em.persist(req2);
         em.persist(convocatoria);
 
-        // 2️⃣ Crear postulante
+        // Crear postulante
         Postulante postulante = new Postulante();
         postulante.setNombre("Marcos");
         postulante.setEdad(28);
         em.persist(postulante);
+
+        // Crear fotos
+        Fotos foto1 = new Fotos();
+        foto1.setUrl("foto1.jpg");
+
+        Fotos foto2 = new Fotos();
+        foto2.setUrl("foto2.jpg");
+
+        // Persistir fotos
+                em.persist(foto1);
+                em.persist(foto2);
 
         //Crear postulación
         Postulacion postulacion = new Postulacion();
@@ -57,11 +68,11 @@ public class DemoFinal {
         postulacion.setReelURL("reel_marcos.mp4");
         postulacion.setEstado(EstadoPostulacion.INICIADA);
         postulacion.setFechaPostulacion(new Date());
-        postulacion.setFotos(new ArrayList<>());// lista vacía de ejemplo
+        postulacion.setFotos(Arrays.asList(foto1, foto2));
         em.persist(postulacion);
 
         //Update de entidad administrada
-        postulante.setNombre("Marcos Actualizado");
+        postulante.setNombre("Sofia");
         postulacion.setEstado(EstadoPostulacion.APROBADA);
 
         //Consulta JPQL
@@ -71,11 +82,6 @@ public class DemoFinal {
                 .getResultList();
 
         System.out.println("Postulaciones aprobadas: " + postulaciones.size());
-
-        //Delete ejemplo (solo si querés limpiar)
-        for (Postulacion p : postulaciones) {
-            em.remove(p);
-        }
 
         BDUtils.commit(em);
 

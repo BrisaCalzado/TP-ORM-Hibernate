@@ -30,7 +30,7 @@ public class Convocatoria {
     private String productoPublicitario;
 
     // Relacion con Requisito (M:N)
-    @ManyToMany
+    @ManyToMany (cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "RequisitoxConvocatoria",
             joinColumns = @JoinColumn(name = "busqueda_id"),

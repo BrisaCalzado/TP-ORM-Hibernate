@@ -26,7 +26,7 @@ public class Postulacion {
     private EstadoPostulacion estado;
     private Date fechaPostulacion;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "PostulacionXFotos",
             joinColumns = @JoinColumn(name = "postulacion_id"),
